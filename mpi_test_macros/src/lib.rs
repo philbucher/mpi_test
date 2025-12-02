@@ -23,15 +23,18 @@ pub fn mpi_test(attr: TokenStream, item: TokenStream) -> TokenStream {
         panic!("mpi_test requires np values!");
     }
 
-    let input_fn = parse_macro_input!(item as ItemFn);
+    let mut input_fn = parse_macro_input!(item as ItemFn);
+
+    // Remove the #[test] attribute if present (added e.g. by rstest)
+    input_fn.attrs.retain(|attr| !attr.path().is_ident("test"));
 
     let fn_name = &input_fn.sig.ident;
-    let mod_ident = format_ident!("{}_mpi", fn_name);
+    // let mod_ident = format_ident!("{}_mpi", fn_name);
 
     // Create the MPI wrapper tests
     let mut wrapper_tests = Vec::new();
     for np in nps {
-        let wrapper_name = format_ident!("np_{}", np);
+        let wrapper_name = format_ident!("mpi_np_{}", np);
         wrapper_tests.push(quote! {
             #[test]
             fn #wrapper_name() {
@@ -42,16 +45,28 @@ pub fn mpi_test(attr: TokenStream, item: TokenStream) -> TokenStream {
     }
 
     let expanded = quote! {
+        #[allow(dead_code)]
         #input_fn
 
         #[cfg(test)]
-        mod #mod_ident {
+        mod #fn_name {
             use super::*;
             use mpi_test_runner::run_mpi;
 
             #(#wrapper_tests)*
         }
     };
+
+    // let ts = std::time::SystemTime::now()
+    //     .duration_since(std::time::UNIX_EPOCH)
+    //     .unwrap()
+    //     .as_micros();
+
+    // std::fs::write(
+    //     format!("/home/philipp/Documents/mpi_test/target/mpi_marco_expansion_{ts}.rs"),
+    //     expanded.to_string(),
+    // )
+    // .unwrap();
 
     expanded.into()
 }
