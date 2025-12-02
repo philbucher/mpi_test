@@ -1,3 +1,3 @@
 [workspace]
 resolver = "2"
-members = ["mpi_test_macros", "mpi_test_runner"]
+members = ["mpi_test_macros", "mpi_test_runner", "example_project"]

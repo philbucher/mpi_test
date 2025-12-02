@@ -26,12 +26,12 @@ pub fn mpi_test(attr: TokenStream, item: TokenStream) -> TokenStream {
     let input_fn = parse_macro_input!(item as ItemFn);
 
     let fn_name = &input_fn.sig.ident;
-    let mod_ident = format_ident!("{}_mpi_wrappers", fn_name);
+    let mod_ident = format_ident!("{}_mpi", fn_name);
 
     // Create the MPI wrapper tests
     let mut wrapper_tests = Vec::new();
     for np in nps {
-        let wrapper_name = format_ident!("{}_np_{}", fn_name, np);
+        let wrapper_name = format_ident!("np_{}", np);
         wrapper_tests.push(quote! {
             #[test]
             fn #wrapper_name() {
