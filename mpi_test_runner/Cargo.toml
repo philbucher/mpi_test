@@ -1,0 +1,8 @@
+[package]
+name = "mpi_test_runner"
+version = "0.1.0"
+edition = "2024"
+
+[lib]
+
+[dependencies]
