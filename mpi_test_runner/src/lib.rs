@@ -1,5 +1,3 @@
-// src/lib.rs of crate: mpi_test_runner
-
 use std::io;
 use std::process::{Command, ExitStatus};
 
