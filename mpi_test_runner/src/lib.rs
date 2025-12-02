@@ -20,7 +20,7 @@ impl From<io::Error> for MpiTestError {
 ///
 /// # Example MPI invocation:
 ///
-/// mpiexec -n <np> <binary> <test_name> --nocapture --exact --ignored
+/// mpiexec -n <np> <binary> <test_name> --nocapture --exact
 ///
 pub fn run_mpi(test_name: &str, np: u32) -> Result<(), MpiTestError> {
     // Determine the test binary (the currently-running binary).
@@ -35,7 +35,6 @@ pub fn run_mpi(test_name: &str, np: u32) -> Result<(), MpiTestError> {
         test_name,
         "--nocapture",
         "--exact",
-        "--ignored",
     ]);
 
     let status = cmd.status()?;

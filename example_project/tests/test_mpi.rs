@@ -51,7 +51,7 @@ fn test_with_values(#[values(10, 20, 30)] count: usize) {
 }
 
 #[rstest]
-#[mpi_test(np = [2])]
+#[mpi_test(np = [2,4])]
 fn test_cartesian_matrix(#[values(1, 2)] x: usize, #[values("a", "b", "c")] y: &str) {
     // Verify the values
     assert!(x == 1 || x == 2);
