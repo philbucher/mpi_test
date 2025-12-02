@@ -1,12 +1,22 @@
 use mpi_test_macros::mpi_test;
 use rstest::rstest;
 
+#[should_panic = "assertion failed: world.size() >= 45"]
 #[mpi_test(np = [2, 4])]
 fn simple_test() {
     use mpi::traits::*;
     let universe = mpi::initialize().unwrap();
     let world = universe.world();
-    assert!(world.size() >= 2);
+    assert!(world.size() >= 45);
+}
+
+#[rstest]
+#[case(1)]
+#[case(2)]
+#[should_panic = "assertion failed: false"] // must be located after rstest stuff!
+#[mpi_test(np = [2, 4])]
+fn check_fail(#[case] _value: usize) {
+    assert!(false);
 }
 
 #[rstest]

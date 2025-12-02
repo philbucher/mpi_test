@@ -38,14 +38,24 @@ pub fn mpi_test(attr: TokenStream, item: TokenStream) -> TokenStream {
         wrapper_tests.push(quote! {
             #[test]
             fn #wrapper_name() {
-                mpi_test_runner::run_mpi(stringify!(#fn_name), #np)
+                // Strip the crate name from module_path and get parent module
+                let full_path = module_path!();
+                let parent_path = full_path.rsplitn(2, "::").nth(1).unwrap();
+                let test_path = if let Some(stripped) = parent_path.split_once("::") {
+                    format!("{}::{}", stripped.1, stringify!(#fn_name))
+                } else {
+                    stringify!(#fn_name).to_string()
+                };
+                mpi_test_runner::run_mpi(&test_path, #np)
                     .expect("MPI test failed");
             }
         });
     }
 
     let expanded = quote! {
-        #[allow(dead_code)]
+        // must be included as regular test and ignored, otherwise `cargo test` won't see it
+        #[test]
+        #[ignore]
         #input_fn
 
         #[cfg(test)]

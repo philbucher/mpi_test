@@ -33,6 +33,7 @@ pub fn run_mpi(test_name: &str, np: u32) -> Result<(), MpiTestError> {
         test_name,
         "--nocapture",
         "--exact",
+        "--ignored",
     ]);
 
     let status = cmd.status()?;
