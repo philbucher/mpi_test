@@ -1,7 +1,50 @@
+//! Procedural macros for MPI testing.
+
 use proc_macro::TokenStream;
 use quote::{format_ident, quote};
 use syn::{Expr, ExprArray, ExprLit, ItemFn, Lit, Meta, parse_macro_input};
 
+/// Attribute macro for creating MPI tests that run with multiple process counts.
+///
+/// This macro wraps a test function and generates separate test cases for each
+/// specified process count. The test function is executed using `mpiexec` with
+/// the given number of processes.
+///
+/// # Syntax
+///
+/// ```no_run
+/// #[mpi_test(np = [2, 4, 8])]
+/// fn my_test() {
+///     // Test code using MPI
+/// }
+/// ```
+///
+/// # Arguments
+///
+/// * `np` - An array of process counts to test with. Can also be a single integer.
+///
+/// # Generated Tests
+///
+/// For each value `N` in the `np` array, a test function named `mpi_np_N` is generated.
+/// For example, `#[mpi_test(np = [2, 4])]` generates `mpi_np_2` and `mpi_np_4` tests.
+///
+/// # Compatibility
+///
+/// This macro can be combined with `rstest` to create parametric MPI tests.
+///
+/// # Example
+///
+/// ```ignore
+/// use mpi_test::mpi_test;
+///
+/// #[mpi_test(np = [2, 4])]
+/// fn test_parallel_sum() {
+///     use mpi::traits::*;
+///     let universe = mpi::initialize().unwrap();
+///     let world = universe.world();
+///     assert!(world.size() >= 2);
+/// }
+/// ```
 #[proc_macro_attribute]
 pub fn mpi_test(attr: TokenStream, item: TokenStream) -> TokenStream {
     let attr_ts = proc_macro2::TokenStream::from(attr);
@@ -77,7 +120,9 @@ pub fn mpi_test(attr: TokenStream, item: TokenStream) -> TokenStream {
     expanded.into()
 }
 
-/// Parses `#[mpi_test(np = [2,4])]`
+/// Parses the `np` argument from `#[mpi_test(np = [2,4])]` syntax.
+///
+/// Supports both array syntax `[2, 4, 8]` and single integer `2`.
 fn parse_np_namevalue(nv: &syn::MetaNameValue) -> Vec<u32> {
     let mut out = Vec::new();
 
