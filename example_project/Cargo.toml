@@ -4,7 +4,6 @@ version = "0.1.0"
 edition = "2024"
 
 [dev-dependencies]
-mpi_test_macros = { path = "../mpi_test_macros" }
-mpi_test_runner = { path = "../mpi_test_runner" }
+mpi_test = { path = "../mpi_test" }
 mpi = "0.8"
 rstest = "0.26.1"

@@ -1,4 +1,4 @@
-use mpi_test_macros::mpi_test;
+use mpi_test::mpi_test;
 use rstest::rstest;
 
 #[mpi_test(np = [2, 4])]

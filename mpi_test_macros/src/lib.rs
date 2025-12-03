@@ -29,7 +29,6 @@ pub fn mpi_test(attr: TokenStream, item: TokenStream) -> TokenStream {
     input_fn.attrs.retain(|attr| !attr.path().is_ident("test"));
 
     let fn_name = &input_fn.sig.ident;
-    // let mod_ident = format_ident!("{}_mpi", fn_name);
 
     // Create the MPI wrapper tests
     let mut wrapper_tests = Vec::new();
@@ -46,8 +45,24 @@ pub fn mpi_test(attr: TokenStream, item: TokenStream) -> TokenStream {
                 } else {
                     stringify!(#fn_name).to_string()
                 };
-                mpi_test_runner::run_mpi(&test_path, #np)
-                    .expect("MPI test failed");
+
+                // Inline MPI runner code
+                let test_binary = std::env::args().next().expect("Missing test binary");
+                let mut cmd = std::process::Command::new("mpiexec");
+                cmd.args(&[
+                    "-n",
+                    &#np.to_string(),
+                    &test_binary,
+                    &test_path,
+                    "--nocapture",
+                    "--exact",
+                    "--ignored",
+                ]);
+
+                let status = cmd.status().expect("Failed to execute mpiexec");
+                if !status.success() {
+                    panic!("MPI test failed with status: {:?}", status);
+                }
             }
         });
     }
@@ -61,22 +76,10 @@ pub fn mpi_test(attr: TokenStream, item: TokenStream) -> TokenStream {
         #[cfg(test)]
         mod #fn_name {
             use super::*;
-            use mpi_test_runner::run_mpi;
 
             #(#wrapper_tests)*
         }
     };
-
-    // let ts = std::time::SystemTime::now()
-    //     .duration_since(std::time::UNIX_EPOCH)
-    //     .unwrap()
-    //     .as_micros();
-
-    // std::fs::write(
-    //     format!("/home/philipp/Documents/mpi_test/target/mpi_marco_expansion_{ts}.rs"),
-    //     expanded.to_string(),
-    // )
-    // .unwrap();
 
     expanded.into()
 }
