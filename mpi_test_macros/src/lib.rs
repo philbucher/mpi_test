@@ -6,17 +6,10 @@ use syn::{Expr, ExprArray, ExprLit, ItemFn, Lit, Meta, parse_macro_input};
 pub fn mpi_test(attr: TokenStream, item: TokenStream) -> TokenStream {
     let attr_ts = proc_macro2::TokenStream::from(attr);
 
-    // Parse "np" argument manually from the attribute tokenstream
+    // Parse "np" argument from the attribute: #[mpi_test(np = [2,4])]
     let nps = match syn::parse2::<Meta>(attr_ts) {
-        Ok(Meta::List(list)) => {
-            // e.g. #[mpi_test(np(2,4))]
-            parse_np_list(&list)
-        }
-        Ok(Meta::NameValue(nv)) => {
-            // e.g. #[mpi_test(np = [2,4])]
-            parse_np_namevalue(&nv)
-        }
-        _ => panic!("Invalid mpi_test attribute syntax. Expected np = [...] or np(...)."),
+        Ok(Meta::NameValue(nv)) => parse_np_namevalue(&nv),
+        _ => panic!("Invalid mpi_test attribute syntax. Expected np = [...]"),
     };
 
     if nps.is_empty() {
@@ -82,24 +75,6 @@ pub fn mpi_test(attr: TokenStream, item: TokenStream) -> TokenStream {
     };
 
     expanded.into()
-}
-
-/// Parses `#[mpi_test(np(2,4))]`
-fn parse_np_list(list: &syn::MetaList) -> Vec<u32> {
-    let mut out = Vec::new();
-
-    for token in list.tokens.clone() {
-        if let Ok(expr) = syn::parse2::<Expr>(token.into()) {
-            if let Expr::Lit(ExprLit {
-                lit: Lit::Int(i), ..
-            }) = expr
-            {
-                out.push(i.base10_parse::<u32>().unwrap());
-            }
-        }
-    }
-
-    out
 }
 
 /// Parses `#[mpi_test(np = [2,4])]`
