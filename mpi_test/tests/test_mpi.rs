@@ -7,11 +7,11 @@ fn simple_test() {
 }
 
 #[mpi_test(np = [2, 4])]
-#[should_panic = "assertion failed: false"]
+#[should_panic = "ITS A PANIC"]
 fn simple_test_failure() {
     log_test_execution();
 
-    assert!(false);
+    panic!("ITS A PANIC");
 }
 
 #[rstest]
@@ -27,12 +27,12 @@ fn test_parametric(#[case] value: usize) {
 #[rstest]
 #[case(1)]
 #[case(2)]
-#[should_panic = "assertion failed: false"] // must be located after rstest stuff!
+#[should_panic = "ITS A PANIC"] // must be located after rstest stuff!
 #[mpi_test(np = [2, 4])]
 fn test_parametric_fail(#[case] _value: usize) {
     log_test_execution();
 
-    assert!(false);
+    panic!("ITS A PANIC");
 }
 
 #[rstest]
