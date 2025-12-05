@@ -67,5 +67,6 @@ fn log_test_execution() {
     use mpi::traits::*;
     let universe = mpi::initialize().unwrap();
     let world = universe.world();
-    eprintln!("RANK {} reached test body", world.rank());
+    // using underscores as they are unlikely to be scrambled by other test output
+    eprintln!("RANK_{}_reached_test_body", world.rank());
 }

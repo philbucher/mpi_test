@@ -1,0 +1,60 @@
+name: Rust
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        curl -L --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/cargo-bins/cargo-binstall/main/install-from-binstall-release.sh | bash
+        cargo binstall --no-confirm cargo-nextest
+
+    - name: Check formatting
+      run: |
+        rustup component add rustfmt --toolchain nightly
+        cargo +nightly fmt --all --check
+
+    - name: Install MPI dependencies
+      run: |
+        sudo apt-get remove -y man-db || true # to speed up
+        sudo apt-get update
+        sudo apt-get install libopenmpi-dev libhdf5-openmpi-dev --no-install-recommends
+
+    - name: Run clippy
+      run: |
+        cargo clippy --all-targets -- -D warnings
+
+    - name: Run tests (debug mode)
+      env:
+        OMPI_MCA_rmaps_base_oversubscribe: 1            # Allow oversubscription for MPI (needed for OpenMPI >= 3.0)
+      run: |
+        rustup show active-toolchain
+        cargo nextest run
+
+    - name: Run tests (release mode)
+      env:
+        OMPI_MCA_rmaps_base_oversubscribe: 1            # Allow oversubscription for MPI (needed for OpenMPI >= 3.0)
+      run: |
+        rustup show active-toolchain
+        cargo nextest run --release
+
+    - name: Check Docs
+      continue-on-error: true # TODO fix and remove
+      run: RUSTDOCFLAGS="-D warnings -D missing_docs" cargo doc --no-deps --document-private-items
