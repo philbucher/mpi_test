@@ -47,13 +47,15 @@ jobs:
       run: |
         rustup show active-toolchain
         cargo nextest run
+        python3 .github/validate_test_execution.py target/nextest/ci/junit.xml
 
     - name: Run tests (release mode)
       env:
         OMPI_MCA_rmaps_base_oversubscribe: 1            # Allow oversubscription for MPI (needed for OpenMPI >= 3.0)
       run: |
         rustup show active-toolchain
-        cargo nextest run --release
+        cargo nextest run --release --profile ci
+        python3 .github/validate_test_execution.py target/nextest/ci/junit.xml
 
     - name: Check Docs
       continue-on-error: true # TODO fix and remove
