@@ -47,6 +47,13 @@ jobs:
         cargo nextest run --profile ci
         python3 .github/validate_test_execution.py target/nextest/ci/junit.xml
 
+    - name: Upload JUnit test results (debug)
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: junit-test-results-debug
+        path: target/nextest/ci/junit.xml
+
     - name: Run tests (release mode)
       env:
         OMPI_MCA_rmaps_base_oversubscribe: 1            # Allow oversubscription for MPI (needed for OpenMPI >= 3.0)
@@ -55,6 +62,12 @@ jobs:
         cargo nextest run --release --profile ci
         python3 .github/validate_test_execution.py target/nextest/ci/junit.xml
 
+    - name: Upload JUnit test results (release)
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: junit-test-results-release
+        path: target/nextest/ci/junit.xml
+
     - name: Check Docs
-      continue-on-error: true # TODO fix and remove
       run: RUSTDOCFLAGS="-D warnings -D missing_docs" cargo doc --no-deps --document-private-items
