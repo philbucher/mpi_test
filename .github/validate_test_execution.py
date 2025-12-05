@@ -69,7 +69,7 @@ def validate_test_execution(testcase: ET.Element) -> tuple[bool, str]:
         return False, f"Test {test_name}: No rank execution logs found (expected {num_processes} ranks)"
 
     missing_ranks = expected_ranks - found_ranks
-    
+
     if missing_ranks:
         if len(missing_ranks) == num_processes:
             # All ranks missing - complete failure
