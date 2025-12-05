@@ -5,3 +5,7 @@ edition = "2024"
 
 [dependencies]
 mpi_test_macros = { path = "../mpi_test_macros" }
+
+[dev-dependencies]
+mpi = "0.8"
+rstest = "0.26.1"
