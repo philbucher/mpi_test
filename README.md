@@ -1,6 +1,6 @@
-# mpi_test
+# A Rust testing framework for MPI (Message Passing Interface) applications
 
-A Rust testing framework for MPI (Message Passing Interface) applications. This crate provides the `#[mpi_test]` procedural macro which simplifies writing and running tests for MPI-based parallel applications.
+This crate provides the `#[mpi_test]` procedural macro which simplifies writing and running tests for MPI-based parallel applications.
 
 ## Features
 
