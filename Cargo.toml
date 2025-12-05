@@ -1,12 +1,22 @@
-[workspace]
-resolver = "2"
-members = ["mpi_test_macros", "mpi_test"]
-
-[workspace.package]
+[package]
 authors = ["Philipp Bucher"]
 categories = ["development-tools::testing"]
+description = "Procedural macros for mpi_test crate"
 edition = "2024"
 keywords = ["mpi", "testing", "hpc", "parallel"]
 license = "MIT"
+name = "mpi_test"
 repository = "https://github.com/philbucher/mpi_test"
 version = "0.1.0"
+
+[lib]
+proc-macro = true
+
+[dependencies]
+syn = { version = "2", features = ["full"] }
+quote = "1"
+proc-macro2 = "1"
+
+[dev-dependencies]
+mpi = "0.8"
+rstest = "0.26.1"
