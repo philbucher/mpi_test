@@ -7,6 +7,7 @@ This crate provides the `#[mpi_test]` procedural macro which simplifies writing 
 - **Easy MPI Testing**: Write tests with the `#[mpi_test]` attribute
 - **Multiple Process Counts**: Test with different numbers of MPI processes using `np` parameter
 - **Integration with rstest**: Combine with parametric tests using `#[rstest]`
+- **Compatible with standard tests**: Coexists with regular tests `#[test]`in the same file
 
 ## Usage
 
@@ -62,6 +63,8 @@ As of now it is not possible to configure which launcher is used; `mpiexec` is h
 Furthermore the reporting of the test-outputs is happening on all ranks. This is fully displayed (and thus rather cluttered) when using `cargo test`. It is therefore recommended to use `cargo nextest run`, which by default only shows the overview.
 
 In order to encapsulate the tests, they are each launched separately with MPI. This prevents earlier tests from altering or crashing tests that are run later. This approach, however, comes with a small overhead of launching an MPI application once per MPI test.
+
+Standard and mpi tests can be mixed in the same file.
 
 Currently the default test harness is used, which means that each test is compiled into a standard test executable, from which it is called with MPI. The base test is ignored by default (since it should only be run with MPI), which unfortunately shows up in the reporting of the test runner.
 

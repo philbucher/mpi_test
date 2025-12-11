@@ -1,6 +1,12 @@
 use mpi_test::mpi_test;
 use rstest::rstest;
 
+#[test]
+fn standard_test() {
+    // just a standard test to verify that normal tests still work
+    assert_eq!(2 + 2, 4);
+}
+
 #[mpi_test(np = [2, 4])]
 fn simple_test() {
     log_test_execution();
