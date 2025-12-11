@@ -46,6 +46,9 @@ def validate_test_execution(testcase: ET.Element) -> tuple[bool, str]:
     num_processes = extract_num_processes(test_name)
 
     if num_processes is None:
+        if test_name == "standard_test":
+            # Special case: standard test without MPI
+            return True, f"Test {test_name}: OK (standard test without MPI)"
         return False, f"Could not extract number of processes from test name: {test_name}"
 
     # Find the system-err element
