@@ -63,6 +63,11 @@ mod my_module {
 
 /// Logs the execution of the test from all MPI ranks.
 /// used to check that all ranks reach the test body
+#[expect(
+    clippy::unwrap_used,
+    clippy::print_stderr,
+    reason = "Test helper function"
+)]
 fn log_test_execution() {
     use mpi::traits::*;
     let universe = mpi::initialize().unwrap();

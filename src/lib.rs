@@ -46,6 +46,7 @@ use syn::{Expr, ExprArray, ExprLit, ItemFn, Lit, Meta, parse_macro_input};
 /// }
 /// ```
 #[proc_macro_attribute]
+#[expect(clippy::panic, reason = "Ok for generating compile-time macro errors")]
 pub fn mpi_test(attr: TokenStream, item: TokenStream) -> TokenStream {
     let attr_ts = proc_macro2::TokenStream::from(attr);
 
@@ -55,9 +56,7 @@ pub fn mpi_test(attr: TokenStream, item: TokenStream) -> TokenStream {
         _ => panic!("Invalid mpi_test attribute syntax. Expected np = [...]"),
     };
 
-    if nps.is_empty() {
-        panic!("mpi_test requires np values!");
-    }
+    assert!(!nps.is_empty(), "mpi_test requires np values!");
 
     let mut input_fn = parse_macro_input!(item as ItemFn);
 
@@ -106,7 +105,7 @@ pub fn mpi_test(attr: TokenStream, item: TokenStream) -> TokenStream {
     let expanded = quote! {
         // must be included as regular test and ignored, otherwise `cargo test` won't see it
         #[test]
-        #[ignore]
+        #[ignore = "Base MPI test, will be run with mpiexec"]
         #input_fn
 
         #[cfg(test)]
@@ -123,6 +122,11 @@ pub fn mpi_test(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// Parses the `np` argument from `#[mpi_test(np = [2,4])]` syntax.
 ///
 /// Supports both array syntax `[2, 4, 8]` and single integer `2`.
+#[expect(
+    clippy::unwrap_used,
+    clippy::panic,
+    reason = "Ok for generating compile-time macro errors"
+)]
 fn parse_np_namevalue(nv: &syn::MetaNameValue) -> Vec<u32> {
     let mut out = Vec::new();
 
